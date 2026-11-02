@@ -9,6 +9,7 @@ import {
   type SettingsView,
   type LabEvent,
 } from '../shared/lesson.js';
+import { observeCode } from './highlight.js';
 import { renderMarkdown } from './markdown.js';
 import { createEventParser } from '../shared/sse.js';
 const el = <T extends HTMLElement = HTMLElement>(s: string): T => {
@@ -25,6 +26,7 @@ function node<K extends keyof HTMLElementTagNameMap>(tag: K, text?: string, clas
 let metadata: Metadata;
 let lastInvocation: Invocation | undefined;
 let liveController: AbortController | undefined;
+observeCode();
 const tabs = [...document.querySelectorAll<HTMLButtonElement>('[role=tab]')];
 function selectTab(tab: HTMLButtonElement) {
   for (const x of tabs) {
@@ -196,7 +198,8 @@ function exportsView(group = 'all') {
       node('span', `${item.kind} · typeof ${item.runtimeType}`, 'runtime-kind'),
       node('p', item.purpose),
     );
-    const code = node('pre');
+    const code = node('pre', undefined, 'code-light');
+    code.dataset.lang = 'ts';
     code.append(node('code', item.example));
     card.append(code);
     grid.append(card);
@@ -228,7 +231,8 @@ function nameLookup() {
       'lookup-summary',
     ),
   );
-  const pre = node('pre');
+  const pre = node('pre', undefined, 'code-light');
+  pre.dataset.lang = 'json';
   pre.append(
     node(
       'code',

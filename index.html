@@ -150,7 +150,7 @@
             </p>
             <details class="file-preview">
               <summary>Inspect the actual tool definition</summary>
-              <pre><code id="tool-source">Loading source…</code></pre>
+              <pre class="code-light"><code id="tool-source">Loading source…</code></pre>
             </details>
             <p class="boundary-note">
               The handler reads a bundled array of course lessons. The annotation describes that
@@ -193,9 +193,13 @@
             <details class="card envelope">
               <summary>Inspect the actual input schema and MCP envelope</summary>
               <h3>tools/list → inputSchema</h3>
-              <pre><code id="schema-output">Call the tool to inspect the discovered schema.</code></pre>
+              <pre
+                class="code-light"
+              ><code id="schema-output">Call the tool to inspect the discovered schema.</code></pre>
               <h3>tools/call → result</h3>
-              <pre><code id="tool-output">The result will appear here.</code></pre>
+              <pre
+                class="code-light"
+              ><code id="tool-output">The result will appear here.</code></pre>
             </details>
             <p class="tool-result-note">
               An MCP tool result supplies information to a caller. An agent’s final SDK
@@ -213,7 +217,7 @@
               The workshop above calls the tool directly. This optional path starts a real Claude
               query and lets the agent discover the same capability.
             </p>
-            <pre><code>const server = createCourseServer();
+            <pre data-lang="ts"><code>const server = createCourseServer();
 const q = query({
   prompt,
   options: {
@@ -238,7 +242,7 @@ const q = query({
               ><button class="button secondary" id="live-stop" disabled>Stop</button>
             </div>
             <p id="live-status" aria-live="polite"></p>
-            <pre id="live-events"></pre>
+            <pre id="live-events" data-lang="none"></pre>
             <div id="live-result" class="live-result"></div>
           </div>
         </details>
@@ -277,7 +281,7 @@ const q = query({
         </div>
         <div class="callout">
           <strong>Keep imports intentional</strong>
-          <pre><code>import { query, tool, createSdkMcpServer }
+          <pre class="code-light" data-lang="ts"><code>import { query, tool, createSdkMcpServer }
   from '@anthropic-ai/claude-agent-sdk';
 import { query as coreQuery }
   from '@anthropic-ai/claude-agent-sdk/core';
@@ -322,7 +326,7 @@ import type { FileReadInput }
                 </div>
               </dl>
               <p id="settings-explanation"></p>
-              <pre><code id="settings-json"></code></pre>
+              <pre class="code-light" data-lang="json"><code id="settings-json"></code></pre>
             </div>
             <p class="help">
               Only mode values and source names are returned. Managed machine policy may affect the
@@ -343,7 +347,7 @@ import type { FileReadInput }
             <div id="name-result" aria-live="polite"></div>
             <details>
               <summary>Inspect the actual lookup tables</summary>
-              <pre><code id="constants-json"></code></pre>
+              <pre class="code-light" data-lang="json"><code id="constants-json"></code></pre>
             </details>
             <p class="help">
               A lookup table describes names. A session’s configuration and initialization messages
