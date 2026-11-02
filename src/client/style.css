@@ -503,6 +503,7 @@ textarea[readonly] {
   overflow: auto;
   font-size: 0.86rem;
   background: #f6f8fa;
+  color: var(--ink);
   line-height: 1.6;
   padding: 12px;
   border-radius: 7px;
@@ -817,6 +818,7 @@ textarea[readonly] {
 }
 .package-card pre {
   background: #f1f5f7;
+  color: var(--ink);
   font-size: 0.86rem;
   line-height: 1.9;
   border-radius: 6px;
@@ -1264,6 +1266,7 @@ textarea[readonly] {
   padding: 14px;
   border-radius: 7px;
   background: #edf3f5;
+  color: var(--ink);
   margin: 10px 0;
 }
 .tool-result-note {
