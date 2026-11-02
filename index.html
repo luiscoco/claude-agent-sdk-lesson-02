@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Lesson 2 of Claude Agent SDK TypeScript 0.3.310: real tools, MCP server registration, core exports, settings, and constants."
+    />
+    <title>Lesson 02 · Core API Workbench</title>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the workbench</a>
+    <header class="site-header wrap">
+      <a class="brand" href="#"
+        ><span class="brand-mark" aria-hidden="true">&lt;/&gt;</span
+        ><span>Core API Workbench<small>LESSON 02</small></span></a
+      >
+      <div class="header-right">
+        <span class="version" id="version">SDK 0.3.310</span
+        ><a
+          class="repo-link"
+          href="https://github.com/luiscoco/claude-agent-sdk-lesson-02"
+          target="_blank"
+          rel="noopener noreferrer"
+          >View source ↗</a
+        >
+      </div>
+    </header>
+    <main class="wrap" id="main">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">CORE EXPORTS &amp; MAIN APIs</p>
+          <h1>From an export<br /><span>to a real tool.</span></h1>
+          <p class="hero-copy">
+            Define a capability, validate its input, and call it through MCP. Then see how the SDK’s
+            exports fit together in a TypeScript host.
+          </p>
+          <div class="hero-badges">
+            <span class="pill teal">● Real SDK tools · no model key needed</span
+            ><span class="quiet">Claude Agent SDK · TypeScript 0.3.310</span>
+          </div>
+        </div>
+        <aside class="lesson-note">
+          <span class="lesson-number">02<span>/ 09</span></span
+          ><strong>A tool is a clear contract.</strong>
+          <p>One purpose. Valid input.<br />A handler with a structured result.</p>
+          <span class="note-line"></span
+          ><small>A course companion by<br /><b>Luis Coco Enríquez</b></small>
+        </aside>
+      </section>
+      <nav class="tabs" role="tablist" aria-label="Lesson activities">
+        <button
+          role="tab"
+          id="tab-tool"
+          data-tab="tool"
+          aria-controls="panel-tool"
+          aria-selected="true"
+        >
+          01 <span>Tool workshop</span></button
+        ><button
+          role="tab"
+          id="tab-exports"
+          data-tab="exports"
+          aria-controls="panel-exports"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          02 <span>Core exports</span></button
+        ><button
+          role="tab"
+          id="tab-settings"
+          data-tab="settings"
+          aria-controls="panel-settings"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          03 <span>Settings &amp; constants</span></button
+        ><button
+          role="tab"
+          id="tab-practice"
+          data-tab="practice"
+          aria-controls="panel-practice"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          04 <span>Check your understanding</span>
+        </button>
+      </nav>
+      <section id="panel-tool" role="tabpanel" aria-labelledby="tab-tool">
+        <div class="flow">
+          <div class="flow-step" data-stage="contract">
+            <span class="step-number">1</span>
+            <div><strong>Name + description</strong><small>State the capability</small></div>
+          </div>
+          <div class="flow-step" data-stage="schema">
+            <span class="step-number">2</span>
+            <div><strong>Input schema</strong><small>Validate arguments</small></div>
+          </div>
+          <div class="flow-step" data-stage="handler">
+            <span class="step-number">3</span>
+            <div><strong>Execute handler</strong><small>Perform host-side work</small></div>
+          </div>
+          <div class="flow-step" data-stage="result">
+            <span class="step-number">4</span>
+            <div><strong>MCP tool result</strong><small>Return structured data</small></div>
+          </div>
+        </div>
+        <p class="stage-caption">
+          This workshop calls a real SDK-defined tool over in-memory MCP. It makes no model request.
+        </p>
+        <div id="notice" class="notice" role="alert" hidden></div>
+        <div class="lab-grid">
+          <section class="card host-card">
+            <div class="card-title">
+              <div>
+                <p class="eyebrow">THE CONTRACT</p>
+                <h2>Course catalog lookup</h2>
+              </div>
+              <span class="tag">read-only</span>
+            </div>
+            <label for="tool-name-display">Tool name</label
+            ><input
+              id="tool-name-display"
+              class="plain-input mono"
+              readonly
+              value="lookup_lesson"
+            />
+            <p id="tool-description" class="help"></p>
+            <form id="invoke-form">
+              <label for="arguments">JSON arguments</label
+              ><textarea id="arguments" rows="6" maxlength="4000" spellcheck="false">
+{
+  "lessonId": 2,
+  "includePractice": true
+}</textarea>
+              <div class="presets">
+                <button type="button" data-preset="valid">Valid input</button
+                ><button type="button" data-preset="wrong">Wrong type</button
+                ><button type="button" data-preset="missing">Missing ID</button>
+              </div>
+              <button class="button primary wide" id="invoke" type="submit" disabled>
+                Call the tool <span aria-hidden="true">→</span>
+              </button>
+            </form>
+            <p class="help">
+              Try a numeric lesson ID from 1 to 9. A string such as <code>"2"</code> should be
+              rejected before execution.
+            </p>
+            <details class="file-preview">
+              <summary>Inspect the actual tool definition</summary>
+              <pre><code id="tool-source">Loading source…</code></pre>
+            </details>
+            <p class="boundary-note">
+              The handler reads a bundled array of course lessons. The annotation describes that
+              behavior; it is not a permission boundary.
+            </p>
+          </section>
+          <div class="output-column">
+            <section class="card">
+              <div class="stream-title">
+                <div>
+                  <p class="eyebrow">REAL MCP ROUND TRIP</p>
+                  <h2>Tool result</h2>
+                </div>
+                <span id="call-status" class="status">Ready</span>
+              </div>
+              <div class="stream-meta">
+                <code>createSdkMcpServer() → tools/call</code
+                ><span id="handler-count">0 handler calls</span>
+              </div>
+              <div id="empty-state" class="empty-state">
+                <span class="empty-symbol" aria-hidden="true">{ ✓ }</span>
+                <h3>One call. A clear contract.</h3>
+                <p>
+                  Send valid input to see a result.<br />Send invalid input to see where it stops.
+                </p>
+              </div>
+              <section id="lesson-result" class="lesson-result" hidden>
+                <p class="eyebrow" id="lesson-id"></p>
+                <h3 id="lesson-title"></h3>
+                <p id="lesson-summary"></p>
+                <p id="lesson-practice"></p>
+              </section>
+              <ol id="call-steps" class="call-steps" aria-label="Actual MCP call steps"></ol>
+              <div class="stream-footer">
+                <span id="validation-summary" aria-live="polite"
+                  >Schema validation and handler execution are separate steps.</span
+                ><button class="text-button" id="export" disabled>Export trace ↓</button>
+              </div>
+            </section>
+            <details class="card envelope">
+              <summary>Inspect the actual input schema and MCP envelope</summary>
+              <h3>tools/list → inputSchema</h3>
+              <pre><code id="schema-output">Call the tool to inspect the discovered schema.</code></pre>
+              <h3>tools/call → result</h3>
+              <pre><code id="tool-output">The result will appear here.</code></pre>
+            </details>
+            <p class="tool-result-note">
+              An MCP tool result supplies information to a caller. An agent’s final SDK
+              <code>result</code> is a different event.
+            </p>
+          </div>
+        </div>
+        <details class="live-panel card">
+          <summary>
+            Let an agent choose the tool <span class="tag">optional · model API charges apply</span>
+          </summary>
+          <div class="live-inner">
+            <h2>Register the server with query()</h2>
+            <p>
+              The workshop above calls the tool directly. This optional path starts a real Claude
+              query and lets the agent discover the same capability.
+            </p>
+            <pre><code>const server = createCourseServer();
+const q = query({
+  prompt,
+  options: {
+    tools: [],
+    mcpServers: { course: server },
+    allowedTools: ['mcp__course__lookup_lesson']
+  }
+});</code></pre>
+            <p class="help">
+              The configuration key <code>course</code> determines the namespace. The hosted
+              server’s descriptive name is <code>course-catalog</code>. The full example also sets a
+              permission mode, limits, and cleanup.
+            </p>
+            <label for="live-prompt">Agent prompt</label
+            ><textarea id="live-prompt" rows="3" maxlength="2000" readonly></textarea>
+            <p class="help" id="live-help">
+              Set ANTHROPIC_API_KEY in the server .env and restart to enable real agent queries. The
+              local tool workshop needs no key.
+            </p>
+            <div class="run-actions">
+              <button class="button primary" id="live-run" disabled>Run live query →</button
+              ><button class="button secondary" id="live-stop" disabled>Stop</button>
+            </div>
+            <p id="live-status" aria-live="polite"></p>
+            <pre id="live-events"></pre>
+            <p id="live-result" class="live-result"></p>
+          </div>
+        </details>
+      </section>
+      <section id="panel-exports" role="tabpanel" aria-labelledby="tab-exports" hidden>
+        <div class="panel-intro">
+          <p class="eyebrow">CHOOSE BY RESPONSIBILITY</p>
+          <h2>Seven functions. Two lookup tables.</h2>
+          <p>
+            Each name is checked against the installed SDK at runtime. The status notes follow the
+            course guide and the matching 0.3.310 declarations.
+          </p>
+        </div>
+        <div class="export-filters" role="group" aria-label="Filter exports">
+          <button data-filter="all" aria-pressed="true">All exports</button
+          ><button data-filter="Run" aria-pressed="false">Run</button
+          ><button data-filter="Prepare" aria-pressed="false">Prepare</button
+          ><button data-filter="Extend" aria-pressed="false">Extend</button
+          ><button data-filter="Configure" aria-pressed="false">Configure</button
+          ><button data-filter="Look up" aria-pressed="false">Look up</button>
+        </div>
+        <div id="exports-grid" class="package-grid"></div>
+        <div class="callout">
+          <strong>Preparation is a separate lifecycle</strong>
+          <p>
+            <code>startup()</code> returns a <code>WarmQuery</code> for a known session; its
+            <code>query(prompt)</code> sends work later. Alpha <code>prewarm()</code> returns a
+            parked <code>SpareProcess</code> that is claimed for a session later. These are
+            different handles.
+          </p>
+          <p>
+            The snippets explain the APIs; this page does not execute preparation or claim a latency
+            improvement. See <code>src/examples/preparation.ts</code> for compile-checked entry
+            points.
+          </p>
+        </div>
+        <div class="callout">
+          <strong>Keep imports intentional</strong>
+          <pre><code>import { query, tool, createSdkMcpServer }
+  from '@anthropic-ai/claude-agent-sdk';
+import { query as coreQuery }
+  from '@anthropic-ai/claude-agent-sdk/core';
+import type { FileReadInput }
+  from '@anthropic-ai/claude-agent-sdk/sdk-tools';</code></pre>
+          <p>
+            Begin with the root package. Choose /core for its focused surface. /sdk-tools is
+            type-only in this version.
+          </p>
+        </div>
+      </section>
+      <section id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" hidden>
+        <div class="panel-intro">
+          <p class="eyebrow">INSPECT · FILTER · LOOK UP</p>
+          <h2>Configuration helpers have a specific job.</h2>
+          <p>
+            Resolve a controlled settings fixture, then compare raw configuration with the SDK’s
+            trust-tier filter. Explore constants separately as lookup data.
+          </p>
+        </div>
+        <div class="package-grid">
+          <article class="card settings-card">
+            <div class="package-top">
+              <h3>Inspect effective settings</h3>
+              <span class="tag alpha">alpha APIs</span>
+            </div>
+            <p>
+              The fixture requests <code>acceptEdits</code> from project settings. This button calls
+              the real <code>resolveSettings()</code> and
+              <code>filterEscalatingDefaultMode()</code>.
+            </p>
+            <button class="button primary" id="settings-run">Inspect settings fixture</button>
+            <div id="settings-results" hidden>
+              <dl class="mode-comparison">
+                <div>
+                  <dt>Raw merged mode</dt>
+                  <dd id="raw-mode"></dd>
+                </div>
+                <div>
+                  <dt>After trust filtering</dt>
+                  <dd id="filtered-mode"></dd>
+                </div>
+              </dl>
+              <p id="settings-explanation"></p>
+              <pre><code id="settings-json"></code></pre>
+            </div>
+            <p class="help">
+              Only mode values and source names are returned. Managed machine policy may affect the
+              merge. This preview does not apply the fixture’s mode to a query.
+            </p>
+          </article>
+          <article class="card settings-card">
+            <div class="package-top">
+              <h3>Look up a tool name</h3>
+              <span class="tag">constants</span>
+            </div>
+            <p>
+              Use <code>BUILTIN_TOOL_NAMES</code> and <code>LEGACY_TOOL_NAME_ALIASES</code> to
+              interpret names.
+            </p>
+            <label for="name-lookup">Built-in name or legacy alias</label
+            ><input class="plain-input mono" id="name-lookup" value="Task" maxlength="100" />
+            <div id="name-result" aria-live="polite"></div>
+            <details>
+              <summary>Inspect the actual lookup tables</summary>
+              <pre><code id="constants-json"></code></pre>
+            </details>
+            <p class="help">
+              A lookup table describes names. A session’s configuration and initialization messages
+              determine its available tools. MCP names have their own namespace.
+            </p>
+          </article>
+        </div>
+      </section>
+      <section id="panel-practice" role="tabpanel" aria-labelledby="tab-practice" hidden>
+        <div class="panel-intro">
+          <p class="eyebrow">DEFINE · VALIDATE · EXPLAIN</p>
+          <h2>Can you explain the contract?</h2>
+          <p>
+            Call the tool once with valid input and once with an invalid type. Compare the schema,
+            handler count, and result before answering.
+          </p>
+        </div>
+        <form id="quiz" class="quiz">
+          <div id="quiz-questions"></div>
+          <div class="quiz-actions">
+            <button class="button primary" type="submit">Check my answers</button
+            ><button class="button secondary" type="reset">Reset</button
+            ><output id="quiz-score" aria-live="polite"></output>
+          </div>
+        </form>
+        <div class="callout">
+          <strong>Your next small experiment</strong>
+          <p>
+            In the source, add an optional field to the schema and use it in the handler. Test
+            valid, missing, and incorrectly typed arguments through MCP. Explain which exports
+            define, expose, and run the capability.
+          </p>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer wrap">
+      <span>Lesson 2 · Core Exports and Main APIs</span
+      ><span
+        >Luis Coco Enríquez · MIT licensed ·
+        <a href="https://github.com/luiscoco/claude-agent-sdk-lesson-01"
+          >Lesson 1 companion ↗</a
+        ></span
+      >
+    </footer>
+    <script type="module" src="/src/client/main.ts"></script>
+  </body>
+</html>
