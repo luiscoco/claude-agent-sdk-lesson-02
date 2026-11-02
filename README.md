@@ -1,4 +1,4 @@
-# Lesson 02 · Core API Workbench
+# Lesson 02 Core API Workbench
 
 **A hands-on companion to “Claude Agent SDK TypeScript version 0.3.310” by Luis Coco Enríquez.**
 
