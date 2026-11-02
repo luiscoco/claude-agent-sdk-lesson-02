@@ -9,6 +9,7 @@ import {
   type SettingsView,
   type LabEvent,
 } from '../shared/lesson.js';
+import { renderMarkdown } from './markdown.js';
 import { createEventParser } from '../shared/sse.js';
 const el = <T extends HTMLElement = HTMLElement>(s: string): T => {
   const x = document.querySelector<T>(s);
@@ -281,6 +282,7 @@ async function runLive() {
   el<HTMLButtonElement>('#live-stop').disabled = false;
   el('#live-events').textContent = '';
   el('#live-result').textContent = '';
+  el('#live-result').classList.remove('markdown');
   el('#live-status').textContent = 'Starting real SDK query…';
   let gotDone = false;
   try {
@@ -301,7 +303,13 @@ async function runLive() {
       if (item.kind === 'message') {
         el('#live-events').textContent +=
           `${item.message.type}${item.message.subtype ? ' / ' + item.message.subtype : ''}${item.message.toolName ? ' / ' + item.message.toolName : ''}\n`;
-        if (item.message.final) el('#live-result').textContent = item.message.final.text;
+        const final = item.message.final;
+        if (final) {
+          // Successful results are model Markdown; error text stays literal.
+          if (final.ok) renderMarkdown(el('#live-result'), final.text);
+          else el('#live-result').textContent = final.text;
+          el('#live-result').classList.toggle('markdown', final.ok);
+        }
       }
       if (item.kind === 'error') el('#live-status').textContent = item.text;
       if (item.kind === 'done') {
