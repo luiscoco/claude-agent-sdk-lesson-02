@@ -4,7 +4,7 @@
 
 Build on [Lesson 1's Agent Lab](https://github.com/luiscoco/claude-agent-sdk-lesson-01): define a useful capability, validate its arguments, expose it through MCP, and understand which SDK export performs each job.
 
-![Core API Workbench after a successful tool call](docs/core-api-workbench.png)
+![Refreshed course interface with larger text](docs/visual-refresh-desktop.png)
 
 ## Run the sample
 
@@ -182,3 +182,5 @@ On Linux, Playwright may need `npx playwright install --with-deps chromium`. Git
 Documentation evolves; this sample's code contract is the pinned 0.3.310 package. The runnable tool uses `tool(name, description, schema, handler, extras?)` and an MCP result envelope, matching that version's declarations.
 
 MIT © Luis Coco Enríquez. Independent educational sample; not an official Anthropic product.
+
+See [visual style and reading controls](docs/visual-style.md) for the refreshed reference palette, larger typography, and persistent text-size setting.
